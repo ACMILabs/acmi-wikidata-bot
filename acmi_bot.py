@@ -1,3 +1,6 @@
+from wikibaseintegrator import wbi_login, datatypes, WikibaseIntegrator
+from wikibaseintegrator.wbi_config import config as wbi_config
+from wikibaseintegrator.wbi_enums import ActionIfExists
 import json
 import pandas
 import pathlib
@@ -58,6 +61,22 @@ acmi_wikidata_links['wikidata_id'] = acmi_wikidata_links['wikidata_id'].str.spli
 candidates = pandas.merge(acmi_api_links, acmi_wikidata_links, on=acmi_wikidata_links.columns.to_list(), how='left', indicator=True)
 candidate = candidates.loc[candidates._merge.isin(['left_only'])][:1].to_dict('records')
 
-print(candidate)
+# bot write code
 
-# wikibaseintegrator bot code goes here
+if len(candidate):
+
+    with open(pathlib.Path.cwd() / 'bot_login.json') as credentials:
+        credentials = json.load(credentials)
+    
+    login_wikidata = wbi_login.Login(user=credentials['user'], password=credentials['pass'], mediawiki_api_url='https://www.wikidata.org/w/api.php')
+    wbi_config['USER_AGENT'] = 'acmi-bot/1.0 (https://www.wikidata.org/wiki/User:Pxxlhxslxn)'
+
+    data = candidate[0]
+
+    wbi = WikibaseIntegrator(login=login_wikidata)
+    wd_item = wbi.item.get(str(data['wikidata_id']), mediawiki_api_url='https://www.wikidata.org/w/api.php', login=login_wikidata)
+    claim = datatypes.ExternalID(prop_nr='P7003', value=data['acmi_id'])    
+    wd_item.claims.add(claim, action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
+    wd_item.write()
+
+    print(data['wikidata_id'], 'written.')
