@@ -69,7 +69,7 @@ if len(candidate):
         credentials = json.load(credentials)
     
     login_wikidata = wbi_login.Login(user=credentials['user'], password=credentials['pass'], mediawiki_api_url='https://www.wikidata.org/w/api.php')
-    wbi_config['USER_AGENT'] = 'acmi-bot/1.0 (https://www.wikidata.org/wiki/User:Pxxlhxslxn)'
+    wbi_config['USER_AGENT'] = 'ACMIsyncbot/1.0 (https://www.wikidata.org/wiki/User:Pxxlhxslxn)'
 
     data = candidate[0]
 
