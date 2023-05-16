@@ -77,6 +77,6 @@ if len(candidate):
     wd_item = wbi.item.get(str(data['wikidata_id']), mediawiki_api_url='https://www.wikidata.org/w/api.php', login=login_wikidata)
     claim = datatypes.ExternalID(prop_nr='P7003', value=data['acmi_id'])    
     wd_item.claims.add(claim, action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
-    wd_item.write()
+    wd_item.write(summary="added ACMI public identifier.")
 
     print(data['wikidata_id'], 'written.')
