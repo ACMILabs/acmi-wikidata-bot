@@ -69,7 +69,7 @@ if len(candidate):
         credentials = json.load(credentials)
     
     login_wikidata = wbi_login.Login(user=credentials['user'], password=credentials['pass'], mediawiki_api_url='https://www.wikidata.org/w/api.php')
-    wbi_config['USER_AGENT'] = 'acmi-bot/1.0 (https://www.wikidata.org/wiki/User:Pxxlhxslxn)'
+    wbi_config['USER_AGENT'] = 'ACMIsyncbot/1.0 (https://www.wikidata.org/wiki/User:Pxxlhxslxn)'
 
     data = candidate[0]
 
@@ -77,6 +77,6 @@ if len(candidate):
     wd_item = wbi.item.get(str(data['wikidata_id']), mediawiki_api_url='https://www.wikidata.org/w/api.php', login=login_wikidata)
     claim = datatypes.ExternalID(prop_nr='P7003', value=data['acmi_id'])    
     wd_item.claims.add(claim, action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
-    wd_item.write()
+    wd_item.write(summary="added ACMI public identifier.")
 
     print(data['wikidata_id'], 'written.')
