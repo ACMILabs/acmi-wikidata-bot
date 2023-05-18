@@ -14,5 +14,6 @@ jobs:
         wd_password: ${{ secrets.WIKIDATA_PASSWORD }}
     - name: do something
       run: |
-          jq -n '{"test":"${{ secrets.WIKIDATA_USERNAME }}"}' > hello.json
+          jq -n '{"user":"${{ secrets.WIKIDATA_USERNAME }}","pass":"${{ secrets.WIKIDATA_PASSWORD }}"}' > bot_login.json
+          python3 acmi_bot.py
           ls -al
