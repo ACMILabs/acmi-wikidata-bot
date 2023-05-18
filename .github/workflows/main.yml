@@ -15,12 +15,18 @@ jobs:
       uses: jannekem/run-python-script-action@v1
       with:
         script: |
-
+          
+          # import libraries
+          
           import json
           import pathlib
           import subprocess
           
+          # gen json login
+          
           with open(pathlib.Path.cwd() / 'bot_login.json', 'w') as login:
             json.dump({"user":"${{secrets.WIKIDATA_USERNAME}}", "pass":"${{secrets.WIKIDATA_PASSWORD}}"}, login)
+          
+          # run bot script
           
           subprocess.call(['python', 'acmi_bot.py'])
