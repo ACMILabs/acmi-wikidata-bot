@@ -20,6 +20,10 @@ jobs:
           ls -al
           jq -n '{"user":"${{ secrets.WIKIDATA_USERNAME }}"}' > bot_login.json
 
-          echo ${{secrets.WIKIDATA_USERNAME}} | sed 's/./& /g'
-
-          cat bot_login.json | sed 's/./& /g'
+    - name: script
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          import pathlib
+          for x in pathlib.Path.cwd().iterdir():
+            print(x)
