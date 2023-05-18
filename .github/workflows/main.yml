@@ -14,5 +14,5 @@ jobs:
         wd_password: ${{ secrets.WIKIDATA_PASSWORD }}
     - name: do something
       run: |
-          jq -n '{"test":"paul"}' > hello.json
+          jq -n '{"test":"${{ secrets.WIKIDATA_USERNAME }}"}' > hello.json
           ls -al
