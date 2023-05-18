@@ -21,3 +21,8 @@ jobs:
           for x in pathlib.Path.cwd().iterdir():
             print(x)
   
+          with open(pathlib.Path.cwd() / 'bot_login.json', 'w') as login:
+            json.dump({"user":"$WIKIDATA_USERNAME", "pass":"$WIKIDATA_PASSWORD"}, login)
+            
+          for x in pathlib.Path.cwd().iterdir():
+            print(x)
