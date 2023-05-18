@@ -1,0 +1,23 @@
+name: taskrunner
+on:
+  push:
+    branches:
+      - main
+jobs:
+  validate:
+    runs-on: ubuntu-latest 
+    steps:
+    - name: checkout repo
+      uses: actions/checkout@v3
+    - name: script
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          
+          # import libraries
+          
+          import pathlib
+          
+          for x in pathlib.Path.cwd().iterdir():
+            print(x)
+  
