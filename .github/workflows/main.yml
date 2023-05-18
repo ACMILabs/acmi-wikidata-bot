@@ -37,8 +37,8 @@ jobs:
           with open(pathlib.Path.cwd() / 'bot_login.json', 'w') as login:
             json.dump({"user":os.environ['wd_username'], "pass":os.environ['wd_password']}, login)
           
-          print(os.environ['wd_username'])
           print(len(os.environ['wd_username']))
+          print(len(os.environ['wd_password']))
           
           # run bot
 
