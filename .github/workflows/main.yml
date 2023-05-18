@@ -12,7 +12,7 @@ jobs:
       env:
         wd_username: ${{ secrets.WIKIDATA_USERNAME }}
         wd_password: ${{ secrets.WIKIDATA_PASSWORD }}
-      with:
-        script: |
+    - name: do something
+      run: |
           ls -al
           
