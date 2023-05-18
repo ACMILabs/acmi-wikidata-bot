@@ -29,4 +29,4 @@ jobs:
             print(x)
             
           with open(pathlib.Path.cwd() / 'bot_login.json') as load_json:
-            print(json.load(load_json.read()))
+            print(json.load(load_json))
