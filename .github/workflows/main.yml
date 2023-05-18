@@ -37,77 +37,77 @@ jobs:
           print(len(${{secrets.WIKIDATA_USERNAME}}))
           
           # run bot
-          '''
-          def value_extract(row, col):
 
-              ''' Extract dictionary values. '''
+#           def value_extract(row, col):
 
-              return pydash.get(row[col], "value")
+#               ''' Extract dictionary values. '''
 
-          def sparql_query(query, service):
+#               return pydash.get(row[col], "value")
 
-              ''' Send sparql request, and formulate results into a dataframe. '''
+#           def sparql_query(query, service):
 
-              r = requests.get(service, params={"format": "json", "query": query})
-              data = pydash.get(r.json(), "results.bindings")
-              data = pandas.DataFrame.from_dict(data)
-              for x in data.columns:
-                  data[x] = data.apply(value_extract, col=x, axis=1)
+#               ''' Send sparql request, and formulate results into a dataframe. '''
 
-              return data
+#               r = requests.get(service, params={"format": "json", "query": query})
+#               data = pydash.get(r.json(), "results.bindings")
+#               data = pandas.DataFrame.from_dict(data)
+#               for x in data.columns:
+#                   data[x] = data.apply(value_extract, col=x, axis=1)
 
-          # pull acmi api data.
+#               return data
 
-          subprocess.call(['git', 'clone', 'https://github.com/ACMILabs/acmi-api.git', '--depth', '1'])
+#           # pull acmi api data.
 
-          # traverse api json to grab all acmi-side work links.
+#           subprocess.call(['git', 'clone', 'https://github.com/ACMILabs/acmi-api.git', '--depth', '1'])
 
-          acmi_path = pathlib.Path.cwd() / 'acmi-api' / 'app' / 'json' / 'works'
-          acmi_files = [x for x in acmi_path.iterdir() if x.suffix == '.json']
-          acmi_api_links = pandas.DataFrame(columns=['acmi_id', 'wikidata_id'])
+#           # traverse api json to grab all acmi-side work links.
 
-          for x in acmi_files:
-              with open(x) as data:
-                  data = json.load(data)
-              if 'external_references' in data and 'id' in data:
-                  for y in [y for y in data['external_references'] if pydash.get(y, 'source.name') == 'Wikidata']:
-                      acmi_api_links.loc[len(acmi_api_links)] = [(data['id']), (pydash.get(y, 'source_identifier'))]
+#           acmi_path = pathlib.Path.cwd() / 'acmi-api' / 'app' / 'json' / 'works'
+#           acmi_files = [x for x in acmi_path.iterdir() if x.suffix == '.json']
+#           acmi_api_links = pandas.DataFrame(columns=['acmi_id', 'wikidata_id'])
 
-          acmi_api_links['acmi_id'] = 'works/'+acmi_api_links['acmi_id'].astype('str')
+#           for x in acmi_files:
+#               with open(x) as data:
+#                   data = json.load(data)
+#               if 'external_references' in data and 'id' in data:
+#                   for y in [y for y in data['external_references'] if pydash.get(y, 'source.name') == 'Wikidata']:
+#                       acmi_api_links.loc[len(acmi_api_links)] = [(data['id']), (pydash.get(y, 'source_identifier'))]
 
-          # sparql query to wikidata query service to get all wikidata-side work links.
+#           acmi_api_links['acmi_id'] = 'works/'+acmi_api_links['acmi_id'].astype('str')
 
-          query = '''
-            select ?acmi_id ?wikidata_id where 
-            {?wikidata_id wdt:P7003 ?acmi_id; 
-              service wikibase:label { bd:serviceParam wikibase:language "en" }
-              }'''
-          acmi_wikidata_links = sparql_query(query, "https://query.wikidata.org/sparql")
-          acmi_wikidata_links['wikidata_id'] = acmi_wikidata_links['wikidata_id'].str.split('/').str[-1]
+#           # sparql query to wikidata query service to get all wikidata-side work links.
 
-          # identify a candidate acmi api -> wikidata statements to write across in wikidata.
+#           query = '''
+#             select ?acmi_id ?wikidata_id where 
+#             {?wikidata_id wdt:P7003 ?acmi_id; 
+#               service wikibase:label { bd:serviceParam wikibase:language "en" }
+#               }'''
+#           acmi_wikidata_links = sparql_query(query, "https://query.wikidata.org/sparql")
+#           acmi_wikidata_links['wikidata_id'] = acmi_wikidata_links['wikidata_id'].str.split('/').str[-1]
 
-          candidates = pandas.merge(acmi_api_links, acmi_wikidata_links, on=acmi_wikidata_links.columns.to_list(), how='left', indicator=True)
-          candidate = candidates.loc[candidates._merge.isin(['left_only'])][:1].to_dict('records')
+#           # identify a candidate acmi api -> wikidata statements to write across in wikidata.
 
-          # bot write code
+#           candidates = pandas.merge(acmi_api_links, acmi_wikidata_links, on=acmi_wikidata_links.columns.to_list(), how='left', indicator=True)
+#           candidate = candidates.loc[candidates._merge.isin(['left_only'])][:1].to_dict('records')
 
-          if len(candidate):
+#           # bot write code
 
-              with open(pathlib.Path.cwd() / 'bot_login.json') as credentials:
-                  credentials = json.load(credentials)
+#           if len(candidate):
 
-              login_wikidata = wbi_login.Login(user=credentials['user'], password=credentials['pass'], mediawiki_api_url='https://www.wikidata.org/w/api.php')
-              wbi_config['USER_AGENT'] = 'ACMIsyncbot/1.0 (https://www.wikidata.org/wiki/User:Pxxlhxslxn)'
+#               with open(pathlib.Path.cwd() / 'bot_login.json') as credentials:
+#                   credentials = json.load(credentials)
 
-              data = candidate[0]
+#               login_wikidata = wbi_login.Login(user=credentials['user'], password=credentials['pass'], mediawiki_api_url='https://www.wikidata.org/w/api.php')
+#               wbi_config['USER_AGENT'] = 'ACMIsyncbot/1.0 (https://www.wikidata.org/wiki/User:Pxxlhxslxn)'
 
-              wbi = WikibaseIntegrator(login=login_wikidata)
-              wd_item = wbi.item.get(str(data['wikidata_id']), mediawiki_api_url='https://www.wikidata.org/w/api.php', login=login_wikidata)
-              claim = datatypes.ExternalID(prop_nr='P7003', value=data['acmi_id'])    
-              wd_item.claims.add(claim, action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
-              wd_item.write(summary="added ACMI public identifier.")
+#               data = candidate[0]
 
-              print(data['wikidata_id'], 'written.')
+#               wbi = WikibaseIntegrator(login=login_wikidata)
+#               wd_item = wbi.item.get(str(data['wikidata_id']), mediawiki_api_url='https://www.wikidata.org/w/api.php', login=login_wikidata)
+#               claim = datatypes.ExternalID(prop_nr='P7003', value=data['acmi_id'])    
+#               wd_item.claims.add(claim, action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
+#               wd_item.write(summary="added ACMI public identifier.")
+
+#               print(data['wikidata_id'], 'written.')
               
-            '''
+
