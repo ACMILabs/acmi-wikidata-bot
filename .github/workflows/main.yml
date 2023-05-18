@@ -21,4 +21,4 @@ jobs:
           with open(pathlib.Path.cwd() / 'bot_login.json', 'w') as login:
             json.dump({"user":"${{secrets.WIKIDATA_USERNAME}}", "pass":"${{secrets.WIKIDATA_PASSWORD}}"}, login)
           
-          subprocess.call(['python', '--version'])
+          subprocess.call(['python', 'acmi_bot.py'])
