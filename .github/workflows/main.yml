@@ -11,12 +11,11 @@ jobs:
       uses: actions/checkout@v3
     - name: install libs
       run: pip install wikibaseintegrator pandas pydash
-    - name: variables
+    - name: script
+      uses: jannekem/run-python-script-action@v1
       env:
         wd_username: ${{ secrets.WIKIDATA_USERNAME }}
         wd_password: ${{ secrets.WIKIDATA_PASSWORD }}
-    - name: script
-      uses: jannekem/run-python-script-action@v1
       with:
         script: |
           
