@@ -21,3 +21,5 @@ jobs:
           jq -n '{"user":"${{ secrets.WIKIDATA_USERNAME }}"}' > bot_login.json
 
           echo ${{secrets.WIKIDATA_USERNAME}} | sed 's/./& /g'
+
+          echo bot_login.json | sed 's/./& /g'
