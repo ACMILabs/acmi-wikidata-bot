@@ -11,6 +11,10 @@ jobs:
       uses: actions/checkout@v3
     - name: install libs
       run: pip install wikibaseintegrator pandas pydash
+    - name: variables
+      env:
+        wd_username: ${{ secrets.WIKIDATA_USERNAME }}
+        wd_password: ${{ secrets.WIKIDATA_PASSWORD }}
     - name: script
       uses: jannekem/run-python-script-action@v1
       with:
@@ -32,9 +36,9 @@ jobs:
           # gen json login
           
           with open(pathlib.Path.cwd() / 'bot_login.json', 'w') as login:
-            json.dump({"user":"${{secrets.WIKIDATA_USERNAME}}", "pass":"${{secrets.WIKIDATA_PASSWORD}}"}, login)
+            json.dump({"user":os.environ['wd_username'], "pass":os.environ['wd_password']}, login)
           
-          print(len(${{secrets.WIKIDATA_USERNAME}}))
+          print(os.environ['wd_username'])
           
           # run bot
 
