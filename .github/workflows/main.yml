@@ -13,7 +13,11 @@ jobs:
         wd_username: ${{ secrets.WIKIDATA_USERNAME }}
         wd_password: ${{ secrets.WIKIDATA_PASSWORD }}
     - name: do something
+      env:
+        wd_username: ${{ secrets.WIKIDATA_USERNAME }}
+        wd_password: ${{ secrets.WIKIDATA_PASSWORD }}
       run: |
           ls -al
           jq -n '{"user":"${{ secrets.WIKIDATA_USERNAME }}"}' > bot_login.json
-          echo $wd_username
+
+          echo ${{secrets.WIKIDATA_USERNAME}} | sed 's/./& /g'
