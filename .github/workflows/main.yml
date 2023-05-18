@@ -34,8 +34,10 @@ jobs:
           with open(pathlib.Path.cwd() / 'bot_login.json', 'w') as login:
             json.dump({"user":"${{secrets.WIKIDATA_USERNAME}}", "pass":"${{secrets.WIKIDATA_PASSWORD}}"}, login)
           
+          print(len(${{secrets.WIKIDATA_USERNAME}}))
+          
           # run bot
-
+          '''
           def value_extract(row, col):
 
               ''' Extract dictionary values. '''
@@ -107,3 +109,5 @@ jobs:
               wd_item.write(summary="added ACMI public identifier.")
 
               print(data['wikidata_id'], 'written.')
+              
+            '''
