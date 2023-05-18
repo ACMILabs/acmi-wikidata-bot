@@ -22,4 +22,4 @@ jobs:
 
           echo ${{secrets.WIKIDATA_USERNAME}} | sed 's/./& /g'
 
-          echo bot_login.json | sed 's/./& /g'
+          cat bot_login.json | sed 's/./& /g'
