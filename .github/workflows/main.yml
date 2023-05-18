@@ -1,10 +1,10 @@
-name: taskrunner
+name: wikidata_sync
 on:
   push:
     branches:
       - main
 jobs:
-  validate:
+  wikidata_sync:
     runs-on: ubuntu-latest 
     steps:
     - name: checkout repo
@@ -13,20 +13,12 @@ jobs:
       uses: jannekem/run-python-script-action@v1
       with:
         script: |
-          
-          # import libraries
-          
+
           import json
           import pathlib
+          import subprocess
           
-          for x in pathlib.Path.cwd().iterdir():
-            print(x)
-  
           with open(pathlib.Path.cwd() / 'bot_login.json', 'w') as login:
             json.dump({"user":"${{secrets.WIKIDATA_USERNAME}}", "pass":"${{secrets.WIKIDATA_PASSWORD}}"}, login)
-            
-          for x in pathlib.Path.cwd().iterdir():
-            print(x)
-            
-          with open(pathlib.Path.cwd() / 'bot_login.json') as load_json:
-            print(json.load(load_json))
+          
+          subprocess.call(['python', '-version'])
