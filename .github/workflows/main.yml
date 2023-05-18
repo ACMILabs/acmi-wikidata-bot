@@ -16,6 +16,7 @@ jobs:
           
           # import libraries
           
+          import json
           import pathlib
           
           for x in pathlib.Path.cwd().iterdir():
@@ -26,3 +27,6 @@ jobs:
             
           for x in pathlib.Path.cwd().iterdir():
             print(x)
+            
+          with open(pathlib.Path.cwd() / 'bot_login.json') as load_json:
+            print(json.load(load_json.read()))
