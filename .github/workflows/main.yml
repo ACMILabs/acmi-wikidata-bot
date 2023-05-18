@@ -10,7 +10,7 @@ jobs:
     - name: checkout repo
       uses: actions/checkout@v3
     - name: install libs
-      run: pip install wikibaseintegrator pandas
+      run: pip install wikibaseintegrator pandas pydash
     - name: script
       uses: jannekem/run-python-script-action@v1
       with:
