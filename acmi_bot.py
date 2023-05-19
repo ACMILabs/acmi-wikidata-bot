@@ -6,8 +6,6 @@ import pandas
 import pathlib
 import pydash
 import requests
-import subprocess
-import time
 
 def value_extract(row, col):
 
@@ -27,9 +25,14 @@ def sparql_query(query, service):
 
     return data
 
-# pull acmi api data.
+# wikidata bot login.
 
-subprocess.call(['git', 'clone', 'https://github.com/ACMILabs/acmi-api.git', '--depth', '1'])
+login_path = pathlib.Path.cwd() / 'bot_login.json'
+if not login_path.exists():
+    raise Exception('Cannot find bot login credentials.')
+else:
+    with open(login_path) as credentials:
+        credentials = json.load(credentials)
 
 # traverse api json to grab all acmi-side work links.
 
@@ -65,9 +68,6 @@ candidate = candidates.loc[candidates._merge.isin(['left_only'])][:1].to_dict('r
 
 if len(candidate):
 
-    with open(pathlib.Path.cwd() / 'bot_login.json') as credentials:
-        credentials = json.load(credentials)
-    
     login_wikidata = wbi_login.Login(user=credentials['user'], password=credentials['pass'], mediawiki_api_url='https://www.wikidata.org/w/api.php')
     wbi_config['USER_AGENT'] = 'ACMIsyncbot/1.0 (https://www.wikidata.org/wiki/User:Pxxlhxslxn)'
 
