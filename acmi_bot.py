@@ -35,22 +35,30 @@ else:
     with open(login_path) as credentials:
         credentials = json.load(credentials)
 
-# traverse api json to grab all acmi-side work links.
+# traverse api json to grab all acmi-side links.
 
 acmi_path = pathlib.Path.cwd() / 'acmi-api' / 'app' / 'json' / 'works'
 acmi_files = [x for x in acmi_path.iterdir() if x.suffix == '.json']
-acmi_api_links = pandas.DataFrame(columns=['acmi_id', 'wikidata_id'])
+acmi_api_links = pandas.DataFrame(columns=['wikidata_id', 'acmi_id'])
 
 for x in acmi_files:
+
     with open(x) as data:
         data = json.load(data)
+
     if 'external_references' in data and 'id' in data:
         for y in [y for y in data['external_references'] if pydash.get(y, 'source.name') == 'Wikidata']:
-            acmi_api_links.loc[len(acmi_api_links)] = [(data['id']), (pydash.get(y, 'source_identifier'))]
+            formatted_work_id = f"works/{data['id']}"
+            acmi_api_links.loc[len(acmi_api_links)] = [(y['source_identifier']), formatted_work_id]
+    
+    if 'creators_primary' in data:
+        for y in data['creators_primary']:
+            if 'creator_wikidata_id' in y:
+                if y['creator_wikidata_id']:
+                    formatted_creator_id = f"creators/{y['creator_id']}"
+                    acmi_api_links.loc[len(acmi_api_links)] = [(y['creator_wikidata_id']), formatted_creator_id]
 
-acmi_api_links['acmi_id'] = 'works/'+acmi_api_links['acmi_id'].astype('str')
-
-# sparql query to wikidata query service to get all wikidata-side work links.
+# sparql query to wikidata query service to get all wikidata-side links.
 
 query = '''
   select ?acmi_id ?wikidata_id where 
@@ -60,19 +68,19 @@ query = '''
 acmi_wikidata_links = sparql_query(query, "https://query.wikidata.org/sparql")
 acmi_wikidata_links['wikidata_id'] = acmi_wikidata_links['wikidata_id'].str.split('/').str[-1]
 
-# identify a candidate acmi api -> wikidata statements to write across in wikidata.
+# identify candidates for acmi api -> wikidata statements to write across to wikidata.
 
 candidates = pandas.merge(acmi_api_links, acmi_wikidata_links, on=acmi_wikidata_links.columns.to_list(), how='left', indicator=True)
-candidate = candidates.loc[candidates._merge.isin(['left_only'])].to_dict('records')
+candidates = candidates.loc[candidates._merge.isin(['left_only'])]
 
 # bot write code
 
-if len(candidate):
+if len(candidates):
 
     login_wikidata = wbi_login.Login(user=credentials['user'], password=credentials['pass'], mediawiki_api_url='https://www.wikidata.org/w/api.php')
     wbi_config['USER_AGENT'] = 'ACMIsyncbot/1.0 (https://www.wikidata.org/wiki/User:Pxxlhxslxn)'
 
-    for data in candidate[:10]: # this limitation should be removed once bot is tested.
+    for data in candidates.to_dict('records')[:10]: # this limitation should be removed once bot is tested.
 
         time.sleep(4)
 
