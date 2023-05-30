@@ -6,6 +6,7 @@ import pandas
 import pathlib
 import pydash
 import requests
+import time
 
 def value_extract(row, col):
 
