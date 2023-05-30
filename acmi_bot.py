@@ -62,7 +62,7 @@ acmi_wikidata_links['wikidata_id'] = acmi_wikidata_links['wikidata_id'].str.spli
 # identify a candidate acmi api -> wikidata statements to write across in wikidata.
 
 candidates = pandas.merge(acmi_api_links, acmi_wikidata_links, on=acmi_wikidata_links.columns.to_list(), how='left', indicator=True)
-candidate = candidates.loc[candidates._merge.isin(['left_only'])][:1].to_dict('records')
+candidate = candidates.loc[candidates._merge.isin(['left_only'])].to_dict('records')
 
 # bot write code
 
@@ -71,12 +71,14 @@ if len(candidate):
     login_wikidata = wbi_login.Login(user=credentials['user'], password=credentials['pass'], mediawiki_api_url='https://www.wikidata.org/w/api.php')
     wbi_config['USER_AGENT'] = 'ACMIsyncbot/1.0 (https://www.wikidata.org/wiki/User:Pxxlhxslxn)'
 
-    data = candidate[0]
+    for data in candidate[:10]: # this limitation should be removed once bot is tested.
 
-    wbi = WikibaseIntegrator(login=login_wikidata)
-    wd_item = wbi.item.get(str(data['wikidata_id']), mediawiki_api_url='https://www.wikidata.org/w/api.php', login=login_wikidata)
-    claim = datatypes.ExternalID(prop_nr='P7003', value=data['acmi_id'])    
-    wd_item.claims.add(claim, action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
-    wd_item.write(summary="added ACMI public identifier.")
+        time.sleep(4)
 
-    print(data['wikidata_id'], 'written.')
+        wbi = WikibaseIntegrator(login=login_wikidata)
+        wd_item = wbi.item.get(str(data['wikidata_id']), mediawiki_api_url='https://www.wikidata.org/w/api.php', login=login_wikidata)
+        claim = datatypes.ExternalID(prop_nr='P7003', value=data['acmi_id'])    
+        wd_item.claims.add(claim, action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
+        wd_item.write(summary="added ACMI public identifier.")
+
+        print(data['wikidata_id'], 'written.')
