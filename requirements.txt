@@ -2,3 +2,8 @@ pandas==1.5.3
 pydash==7.0.3
 requests==2.28.2
 wikibaseintegrator==0.12.3
+
+# For code linting
+flake8
+pylint
+isort

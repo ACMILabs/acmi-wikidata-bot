@@ -1,6 +1,6 @@
+#!/bin/bash
 
 # fetch latest acmi-api data.
-
 if [ -d acmi-api ]; then
     cd acmi-api
     git fetch && git pull
@@ -10,5 +10,4 @@ else
 fi
 
 # run sync script
-
 python3 acmi_bot.py
