@@ -7,6 +7,7 @@ import time
 import pandas
 import pydash
 import requests
+import sentry_sdk
 from wikibaseintegrator import WikibaseIntegrator, datatypes, wbi_login
 from wikibaseintegrator.wbi_config import config as wbi_config
 from wikibaseintegrator.wbi_enums import ActionIfExists
@@ -34,6 +35,12 @@ if not login_path.exists():
 
 with open(login_path, encoding='utf-8') as credentials:
     credentials = json.load(credentials)
+
+# setup error tracking
+sentry_sdk.init(
+    dsn=credentials.get('sentry', ''),
+    traces_sample_rate=1.0,
+)
 
 # traverse api json to grab all acmi-side links.
 acmi_path = pathlib.Path.cwd() / 'acmi-api' / 'app' / 'json' / 'works'

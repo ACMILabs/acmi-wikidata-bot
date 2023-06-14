@@ -7,3 +7,6 @@ wikibaseintegrator==0.12.3
 flake8
 pylint
 isort
+
+# For error tracking
+sentry-sdk

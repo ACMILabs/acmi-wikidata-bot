@@ -1,1 +1,5 @@
-{ "user": "<YOUR_USERNAME>", "pass": "<YOUR_PASSWORD>" }
+{
+    "user": "<YOUR_USERNAME>",
+    "pass": "<YOUR_PASSWORD>",
+    "sentry": "https://<YOUR_ID>.ingest.sentry.io/<YOUR_ID>"
+}

@@ -13,3 +13,9 @@ Sync bot to push ACMI API Wikidata links to Wikidata.
 ## Check the code for errors
 
 * Run the code linting: `./lint.sh`
+
+## Exception tracking
+
+To keep track of exceptions when running the sync, add your Sentry DSN to `bot_login.json` under `sentry`.
+
+ACMI exceptions are sent to: https://acmi.sentry.io/projects/wikidata-bot
