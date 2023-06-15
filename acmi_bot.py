@@ -96,8 +96,7 @@ if len(candidates):
     )
     wbi_config['USER_AGENT'] = 'ACMIsyncbot/1.0 (https://www.wikidata.org/wiki/User:Pxxlhxslxn)'
 
-    # this limitation should be removed once bot is tested.
-    for data in candidates.to_dict('records')[:10]:
+    for data in candidates.to_dict('records'):
         time.sleep(4)
 
         wbi = WikibaseIntegrator(login=login_wikidata)
