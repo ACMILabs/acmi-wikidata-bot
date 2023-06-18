@@ -84,7 +84,7 @@ candidates = pandas.merge(
     on=acmi_wikidata_links.columns.to_list(),
     how='left',
     indicator=True,
-)
+).drop_duplicates()
 candidates = candidates.loc[candidates._merge.isin(['left_only'])]  # pylint: disable=protected-access
 
 # bot write code
