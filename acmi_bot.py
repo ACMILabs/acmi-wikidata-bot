@@ -11,6 +11,16 @@ import sentry_sdk
 from wikibaseintegrator import WikibaseIntegrator, datatypes, wbi_login
 from wikibaseintegrator.wbi_config import config as wbi_config
 from wikibaseintegrator.wbi_enums import ActionIfExists
+from wikibaseintegrator.wbi_exceptions import MissingEntityException
+
+
+class ACMIBotMissingEntityException(MissingEntityException):
+    """Let's include the Wikidata entity ID in missing entity exceptions."""
+
+    def __init__(self, entity_id, message=None):
+        if message is None:
+            message = f'The Wikidata entity with ID {entity_id} is missing.'
+        super().__init__(message)
 
 
 def value_extract(row, column):
@@ -100,13 +110,16 @@ if len(candidates):
         time.sleep(4)
 
         wbi = WikibaseIntegrator(login=login_wikidata)
-        wd_item = wbi.item.get(
-            str(data['wikidata_id']),
-            mediawiki_api_url='https://www.wikidata.org/w/api.php',
-            login=login_wikidata,
-        )
-        claim = datatypes.ExternalID(prop_nr='P7003', value=data['acmi_id'])
-        wd_item.claims.add(claim, action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
-        wd_item.write(summary="added ACMI public identifier.")
+        try:
+            wd_item = wbi.item.get(
+                str(data['wikidata_id']),
+                mediawiki_api_url='https://www.wikidata.org/w/api.php',
+                login=login_wikidata,
+            )
+            claim = datatypes.ExternalID(prop_nr='P7003', value=data['acmi_id'])
+            wd_item.claims.add(claim, action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
+            wd_item.write(summary="added ACMI public identifier.")
 
-        print(data['wikidata_id'], 'written.')
+            print(data['wikidata_id'], 'written.')
+        except MissingEntityException as exception:
+            raise ACMIBotMissingEntityException(data['wikidata_id']) from exception
